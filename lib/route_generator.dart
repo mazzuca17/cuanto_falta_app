@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'src/pages/splash_screnn.dart';
+import 'src/pages/splash_scren.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
