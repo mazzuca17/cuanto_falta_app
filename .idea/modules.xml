@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/CountDownTimer.iml" filepath="$PROJECT_DIR$/.idea/CountDownTimer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cuanto_falta_app.iml" filepath="$PROJECT_DIR$/cuanto_falta_app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/cuanto_falta_app_android.iml" filepath="$PROJECT_DIR$/android/cuanto_falta_app_android.iml" />
     </modules>
   </component>
 </project>
