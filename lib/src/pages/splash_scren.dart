@@ -28,7 +28,9 @@ class SplashScreenState extends StateMVC<SplashScreen> {
       animate = true;
     });
     await Future.delayed(const Duration(milliseconds: 5000));
-    //Get.to(const WelcomeScreen());
+    Navigator.of(context).pushNamed(
+      '/Home',
+    );
   }
 
   @override
@@ -73,7 +75,6 @@ class SplashScreenState extends StateMVC<SplashScreen> {
           ),
         ],
       ),
-      
     );
   }
 }

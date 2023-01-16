@@ -1,6 +1,5 @@
-import 'package:date_count_down/date_count_down.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'route_generator.dart';
 
 void main() {
@@ -16,6 +15,14 @@ class MyApp extends StatelessWidget {
         initialRoute: '/Splash',
         onGenerateRoute: RouteGenerator.generateRoute,
         debugShowCheckedModeBanner: false,
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: [
+          const Locale('en'), // Inglés
+          const Locale('es'), // Español
+        ],
         theme: ThemeData(
           // fontFamily: 'Poppins',
           fontFamily: 'Josefin Sans',
@@ -68,56 +75,5 @@ class MyApp extends StatelessWidget {
                 fontSize: 12.0, color: Color(0xFF3300C9), height: 1.35),
           ),
         ));
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Countdown Timer:',
-            ),
-            CountDownText(
-              due: DateTime.utc(2050),
-              finishedText: "Done",
-              showLabel: true,
-              longDateName: true,
-              style: TextStyle(color: Colors.blue),
-            ),
-            Text(
-              'Countdown Timer with custom label:',
-            ),
-            CountDownText(
-              due: DateTime.parse("20-01-01 00:00:00"),
-              finishedText: "Done",
-              showLabel: true,
-              longDateName: true,
-              daysTextLong: " DAYS ",
-              hoursTextLong: " HOURS ",
-              minutesTextLong: " MINUTES ",
-              secondsTextLong: " SECONDS ",
-              style: TextStyle(color: Colors.blue),
-            )
-          ],
-        ),
-      ),
-    );
   }
 }
