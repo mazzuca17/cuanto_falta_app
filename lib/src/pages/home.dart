@@ -2,10 +2,7 @@ import 'package:cuanto_falta_app/src/controllers/TimeController.dart';
 import 'package:flutter/material.dart';
 import 'package:date_count_down/date_count_down.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import '../controllers/TimeController.dart';
 import 'dart:async';
-import 'package:intl/intl.dart';
-
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -28,7 +25,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     print(percentage);
-    final f = NumberFormat("###.00");
 
     return Scaffold(
       body: Center(
@@ -36,31 +32,31 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Container(
-                padding: EdgeInsets.all(10),
-                child: CircularPercentIndicator(
-                  //circular progress indicator
-                  radius: 320.0, //radius for circle
-                  lineWidth: 15.0, //width of circle line
-                  animation:
-                      false, //animate when it shows progress indicator first
-                  percent: percentage /
-                      100, //vercentage value: 0.6 for 60% (60/100 = 0.6)
-                  center: Text(
-                    "${percentage.toStringAsFixed(percentage.truncateToDouble() == percentage ? 0 : 2)} %",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
-                  ), //center text, you can set Icon as well
-                  footer: Text(
-                    "Order this Month",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
-                  ), //footer text
-                  backgroundColor:
-                      Colors.lightGreen[300], //backround of progress bar
-                  circularStrokeCap: CircularStrokeCap
-                      .round, //corner shape of progress bar at start/end
-                  progressColor: Colors.redAccent, //progress bar color
-                )),
+              padding: EdgeInsets.all(10),
+              child: CircularPercentIndicator(
+                //circular progress indicator
+                radius: 320.0, //radius for circle
+                lineWidth: 15.0, //width of circle line
+                animation:
+                    false, //animate when it shows progress indicator first
+                percent: percentage /
+                    100, //vercentage value: 0.6 for 60% (60/100 = 0.6)
+                center: Text(
+                  "${percentage.toStringAsFixed(percentage.truncateToDouble() == percentage ? 0 : 2)} %",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+                ), //center text, you can set Icon as well
+                footer: Text(
+                  "Order this Month",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
+                ), //footer text
+                backgroundColor:
+                    Color.fromARGB(0, 0, 0, 0), //backround of progress bar
+                circularStrokeCap: CircularStrokeCap
+                    .round, //corner shape of progress bar at start/end
+                progressColor:
+                    Color.fromARGB(255, 50, 236, 65), //progress bar color
+              ),
+            ),
             Text(
               'Falta para el nuevo año:',
             ),
