@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'route_generator.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(MyApp());
@@ -24,9 +25,8 @@ class MyApp extends StatelessWidget {
           const Locale('es'), // Español
         ],
         theme: ThemeData(
-          // fontFamily: 'Poppins',
-          fontFamily: 'Josefin Sans',
-          primaryColor: Colors.white,
+          fontFamily: 'Poppins',
+          primaryColor: Color(0xFF252525),
           floatingActionButtonTheme: FloatingActionButtonThemeData(
               elevation: 0, foregroundColor: Colors.white),
           brightness: Brightness.light,

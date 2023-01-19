@@ -44,6 +44,7 @@ dependencies:
   percent_indicator: ^4.2.2
   cron: ^0.5.1
   intl: ^0.17.0
+  google_fonts: ^3.0.1
 
 dev_dependencies:
   flutter_test:

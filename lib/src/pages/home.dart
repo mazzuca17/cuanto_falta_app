@@ -27,53 +27,68 @@ class _MyHomePageState extends State<MyHomePage> {
     print(percentage);
 
     return Scaffold(
+      backgroundColor: Color(0xFF252525),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Container(
-              padding: EdgeInsets.all(10),
+              color: Color(0xFF252525),
               child: CircularPercentIndicator(
-                //circular progress indicator
-                radius: 320.0, //radius for circle
-                lineWidth: 15.0, //width of circle line
-                animation:
-                    false, //animate when it shows progress indicator first
-                percent: percentage /
-                    100, //vercentage value: 0.6 for 60% (60/100 = 0.6)
+                header: Text(
+                  "Año:",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w300,
+                    fontSize: 45.0,
+                    color: Color(0xffF2F2F2),
+                  ),
+                ),
+                radius: 200.0,
+                lineWidth: 7.50,
+                animation: false,
+                percent: percentage / 100,
                 center: Text(
                   "${percentage.toStringAsFixed(percentage.truncateToDouble() == percentage ? 0 : 2)} %",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
-                ), //center text, you can set Icon as well
-                footer: Text(
-                  "Order this Month",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17.0),
-                ), //footer text
-                backgroundColor:
-                    Color.fromARGB(0, 0, 0, 0), //backround of progress bar
-                circularStrokeCap: CircularStrokeCap
-                    .round, //corner shape of progress bar at start/end
-                progressColor:
-                    Color.fromARGB(255, 50, 236, 65), //progress bar color
+                  style: TextStyle(
+                    fontWeight: FontWeight.w300,
+                    fontSize: 50.0,
+                    color: Color(0xffF2F2F2),
+                  ),
+                ),
+                backgroundColor: Color.fromARGB(255, 228, 228, 228),
+                circularStrokeCap: CircularStrokeCap.round,
+                progressColor: Color(0XFF3BD16F),
+                curve: Curves.easeOutExpo,
+                arcType: ArcType.FULL,
+                arcBackgroundColor: Colors.blueGrey,
               ),
             ),
             Text(
-              'Falta para el nuevo año:',
-            ),
-            CountDownText(
-              due: DateTime.parse("2024-01-01 00:00:00"),
-              finishedText: "Done",
-              showLabel: true,
-              longDateName: true,
-              daysTextLong: " Días ",
-              hoursTextLong: " Horas ",
-              minutesTextLong: " Minutos ",
-              secondsTextLong: " Segundos ",
+              "Faltan:",
               style: TextStyle(
-                color: Colors.blue,
-                fontSize: 20,
+                fontWeight: FontWeight.w300,
+                fontSize: 20.0,
+                color: Color(0xffF2F2F2),
               ),
-            )
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: CountDownText(
+                due: DateTime.parse("2024-01-01 00:00:00"),
+                finishedText: "Done",
+                showLabel: true,
+                longDateName: true,
+                daysTextLong: " D : ",
+                hoursTextLong: " Hs : ",
+                minutesTextLong: " Min : ",
+                secondsTextLong: " Seg ",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 20.0,
+                  color: Color(0xffF2F2F2),
+                ),
+              ),
+            ),
           ],
         ),
       ),

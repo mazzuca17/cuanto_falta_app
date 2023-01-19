@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.cuanto_falta_app">
    <application
-        android:label="cuanto_falta_app"
+        android:label="Cuánto falta para?"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
