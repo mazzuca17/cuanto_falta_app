@@ -1,4 +1,4 @@
-#Thu Jan 19 02:31:03 ART 2023
-base.0=C\:\\Users\\Usuario\\Documents\\LARS\\FLUTTER\\app_cuanto_falta\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\classes.dex
-renamed.0=classes.dex
+#Mon Jan 01 23:26:24 ART 2024
+base.0=C\:\\Users\\Usuario\\Documents\\LARS_Flutter\\cuanto_falta_app\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\classes.dex
 path.0=classes.dex
+renamed.0=classes.dex

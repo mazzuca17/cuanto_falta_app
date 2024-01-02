@@ -10,21 +10,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var percentage = 0.00;
+  Timer? timer;
+  late TimeController timeController;
+
   @override
   void initState() {
-    Timer.periodic(new Duration(seconds: 1), (timer) {
-      setState(() {
-        percentage = TimeController().calculateTime();
-        //print(percentage);
-      });
-    });
     super.initState();
+    timeController = TimeController();
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  DateTime calculateDueDate() {
+    DateTime currentDate = DateTime.now();
+    return DateTime(currentDate.year + 1, currentDate.month, currentDate.day,
+        currentDate.hour, currentDate.minute, currentDate.second);
   }
 
   @override
   Widget build(BuildContext context) {
-    print(percentage);
+    double percentage = timeController.calculateTime();
 
     return Scaffold(
       backgroundColor: Color(0xFF252525),
@@ -74,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Align(
               alignment: Alignment.center,
               child: CountDownText(
-                due: DateTime.parse("2024-01-01 00:00:00"),
+                due: calculateDueDate(),
                 finishedText: "Done",
                 showLabel: true,
                 longDateName: true,
