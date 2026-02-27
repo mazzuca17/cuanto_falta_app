@@ -8,7 +8,7 @@ class RouteGenerator {
     switch (settings.name) {
       case '/Home':
         return MaterialPageRoute(
-          builder: (_) => MyHomePage(),
+          builder: (_) => const MyHomePage(),
         );
       default:
         // If there is no such named route in the switch statement, e.g. /third
