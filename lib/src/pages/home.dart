@@ -1,11 +1,23 @@
 import 'dart:async';
 
 import 'package:cuanto_falta_app/src/controllers/time_controller.dart';
+import 'package:cuanto_falta_app/src/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  const MyHomePage({
+    super.key,
+    required this.onThemeChanged,
+    required this.onLocaleChanged,
+    required this.currentThemeMode,
+    required this.currentLocale,
+  });
+
+  final ValueChanged<ThemeMode> onThemeChanged;
+  final ValueChanged<Locale> onLocaleChanged;
+  final ThemeMode currentThemeMode;
+  final Locale currentLocale;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -21,18 +33,16 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
     _loadData();
     timer = Timer.periodic(const Duration(seconds: 1), (_) async {
-      if (!mounted) return;
+      if (!mounted || loading) return;
       setState(() {});
-      await timeController.updateWidgetData();
+      await timeController.updateWidgetData(AppStrings.of(context));
     });
   }
 
   Future<void> _loadData() async {
-    await timeController.init();
+    await timeController.init(AppStrings.of(context));
     if (!mounted) return;
-    setState(() {
-      loading = false;
-    });
+    setState(() => loading = false);
   }
 
   @override
@@ -41,25 +51,26 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  Future<void> _openAddEventDialog() async {
+  Future<void> _openAddEventDialog(AppStrings strings) async {
     final titleController = TextEditingController();
     DateTime? pickedDate;
+    bool notify = false;
 
     await showDialog<void>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Nuevo evento'),
+          title: Text(strings.newEvent),
           content: StatefulBuilder(
             builder: (context, setDialogState) {
+              final isNewYear =
+                  pickedDate != null && pickedDate!.month == 1 && pickedDate!.day == 1;
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: titleController,
-                    decoration: const InputDecoration(
-                      hintText: 'Ej: Juntada fin de año',
-                    ),
+                    decoration: InputDecoration(hintText: strings.eventHint),
                   ),
                   const SizedBox(height: 12),
                   OutlinedButton.icon(
@@ -85,15 +96,30 @@ class _MyHomePageState extends State<MyHomePage> {
                           time.hour,
                           time.minute,
                         );
+                        if (pickedDate!.month == 1 && pickedDate!.day == 1) {
+                          notify = true;
+                        }
                       });
                     },
                     icon: const Icon(Icons.event),
                     label: Text(
                       pickedDate == null
-                          ? 'Elegir fecha y hora'
-                          : timeController.formatDate(pickedDate!),
+                          ? strings.pickDateTime
+                          : timeController.formatDate(
+                              pickedDate!,
+                              Localizations.localeOf(context),
+                            ),
                     ),
-                  )
+                  ),
+                  const SizedBox(height: 8),
+                  CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    value: isNewYear ? true : notify,
+                    onChanged: isNewYear
+                        ? null
+                        : (value) => setDialogState(() => notify = value ?? false),
+                    title: Text(strings.notifyWhenFinished),
+                  ),
                 ],
               );
             },
@@ -101,18 +127,23 @@ class _MyHomePageState extends State<MyHomePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
+              child: Text(strings.cancel),
             ),
             FilledButton(
               onPressed: () async {
                 final title = titleController.text.trim();
                 if (title.isEmpty || pickedDate == null) return;
-                await timeController.addEvent(title, pickedDate!);
+                await timeController.addEvent(
+                  title,
+                  pickedDate!,
+                  strings,
+                  notify: notify,
+                );
                 if (!mounted) return;
                 setState(() {});
                 Navigator.pop(context);
               },
-              child: const Text('Guardar'),
+              child: Text(strings.save),
             )
           ],
         );
@@ -122,105 +153,111 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     if (loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return Scaffold(body: Center(child: Text(strings.loading)));
     }
 
     final progress = timeController.calculateRangeProgress();
     final selectedEvent = timeController.selectedEvent;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: const Color(0xFF0C1024),
       appBar: AppBar(
-        title: const Text('Cuánto falta para...'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        title: Text(strings.appTitle),
+        actions: [_buildThemeAndLanguageMenus(strings)],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _openAddEventDialog,
+        onPressed: () => _openAddEventDialog(strings),
         icon: const Icon(Icons.add),
-        label: const Text('Nuevo evento'),
+        label: Text(strings.newEvent),
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF0C1024), Color(0xFF1B2B5E), Color(0xFF364D9E)],
-          ),
-        ),
-        child: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              _buildRangeSelector(),
-              const SizedBox(height: 20),
-              Card(
-                color: Colors.white.withOpacity(0.1),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Progreso de ${timeController.selectedRange.label}',
-                        style:
-                            const TextStyle(fontSize: 20, color: Colors.white),
-                      ),
-                      const SizedBox(height: 20),
-                      CircularPercentIndicator(
-                        radius: 120,
-                        lineWidth: 14,
-                        percent: progress / 100,
-                        animation: false,
-                        progressColor: const Color(0xFF4BF4A2),
-                        backgroundColor: Colors.white24,
-                        center: Text(
-                          '${progress.toStringAsFixed(1)}%',
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 40,
-                              fontWeight: FontWeight.bold),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            _buildRangeSelector(strings),
+            const SizedBox(height: 20),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    Text('${strings.progressOf} ${timeController.selectedRange.localizedLabel(strings)}'),
+                    const SizedBox(height: 20),
+                    CircularPercentIndicator(
+                      radius: 120,
+                      lineWidth: 14,
+                      percent: progress / 100,
+                      animation: false,
+                      progressColor: Theme.of(context).colorScheme.primary,
+                      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      center: Text(
+                        '${progress.toStringAsFixed(1)}%',
+                        style: const TextStyle(
+                          fontSize: 40,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 20),
-                      Text(
-                        'Faltan ${timeController.formatDuration(timeController.getRemainingInRange())}',
-                        style: const TextStyle(color: Colors.white70),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      '${strings.remaining} ${timeController.formatDuration(timeController.getRemainingInRange())}',
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              _buildEventSection(selectedEvent),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+            _buildEventSection(selectedEvent, strings),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildRangeSelector() {
+  Widget _buildThemeAndLanguageMenus(AppStrings strings) {
+    return Row(
+      children: [
+        PopupMenuButton<ThemeMode>(
+          tooltip: strings.theme,
+          initialValue: widget.currentThemeMode,
+          onSelected: widget.onThemeChanged,
+          itemBuilder: (_) => [
+            PopupMenuItem(
+              value: ThemeMode.system,
+              child: Text(strings.system),
+            ),
+            PopupMenuItem(value: ThemeMode.light, child: Text(strings.light)),
+            PopupMenuItem(value: ThemeMode.dark, child: Text(strings.dark)),
+          ],
+          icon: const Icon(Icons.palette_outlined),
+        ),
+        PopupMenuButton<Locale>(
+          tooltip: strings.language,
+          initialValue: widget.currentLocale,
+          onSelected: widget.onLocaleChanged,
+          itemBuilder: (_) => const [
+            PopupMenuItem(value: Locale('es'), child: Text('Español')),
+            PopupMenuItem(value: Locale('en'), child: Text('English')),
+          ],
+          icon: const Icon(Icons.language),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRangeSelector(AppStrings strings) {
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: ProgressRange.values.map((range) {
         final selected = range == timeController.selectedRange;
         return ChoiceChip(
-          selectedColor: const Color(0xFF4BF4A2),
-          backgroundColor: Colors.white12,
-          labelStyle: TextStyle(
-            color: selected ? Colors.black : Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-          label: Text(range.label),
+          label: Text(range.localizedLabel(strings)),
           selected: selected,
           onSelected: (_) async {
-            await timeController.saveSelectedRange(range);
+            await timeController.saveSelectedRange(range, strings);
             setState(() {});
           },
         );
@@ -228,49 +265,45 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildEventSection(CountdownEvent? selectedEvent) {
+  Widget _buildEventSection(CountdownEvent? selectedEvent, AppStrings strings) {
     return Card(
-      color: Colors.white.withOpacity(0.1),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Mis cuentas regresivas',
-              style: TextStyle(color: Colors.white, fontSize: 18),
-            ),
+            Text(strings.myCountdowns, style: const TextStyle(fontSize: 18)),
             const SizedBox(height: 12),
             if (timeController.events.isEmpty)
-              const Text(
-                'Todavía no cargaste eventos personalizados.',
-                style: TextStyle(color: Colors.white70),
-              )
+              Text(strings.noEvents)
             else
               ...timeController.events.map(
                 (event) => ListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: Text(event.title,
-                      style: const TextStyle(color: Colors.white)),
+                  title: Text(event.title),
                   subtitle: Text(
-                    '${timeController.formatDate(event.targetDate)}\nFaltan ${timeController.formatDuration(timeController.getRemainingToEvent(event))}',
-                    style: const TextStyle(color: Colors.white70),
+                    '${timeController.formatDate(event.targetDate, Localizations.localeOf(context))}\n${strings.remaining} ${timeController.formatDuration(timeController.getRemainingToEvent(event))}',
                   ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      Icon(
+                        event.shouldNotify
+                            ? Icons.notifications_active
+                            : Icons.notifications_off,
+                      ),
                       Radio<String>(
                         value: event.id,
                         groupValue: timeController.selectedEventId,
                         onChanged: (value) async {
-                          await timeController.saveSelectedEvent(value);
+                          await timeController.saveSelectedEvent(value, strings);
                           setState(() {});
                         },
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.redAccent),
                         onPressed: () async {
-                          await timeController.deleteEvent(event.id);
+                          await timeController.deleteEvent(event.id, strings);
                           setState(() {});
                         },
                       ),
@@ -279,15 +312,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             if (selectedEvent != null) ...[
-              const Divider(color: Colors.white24),
+              const Divider(),
               Text(
-                'Evento activo: ${selectedEvent.title}',
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w600),
+                '${strings.activeEvent}: ${selectedEvent.title}',
+                style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               Text(
-                'Faltan ${timeController.formatDuration(timeController.getRemainingToEvent(selectedEvent))}',
-                style: const TextStyle(color: Colors.white70),
+                '${strings.remaining} ${timeController.formatDuration(timeController.getRemainingToEvent(selectedEvent))}',
               ),
             ],
           ],

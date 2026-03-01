@@ -1,25 +1,50 @@
+import 'package:cuanto_falta_app/src/l10n/app_strings.dart';
+import 'package:cuanto_falta_app/src/pages/home.dart';
 import 'package:flutter/material.dart';
 
-import 'src/pages/home.dart';
-
 class RouteGenerator {
-  static Route<dynamic> generateRoute(RouteSettings settings) {
-    /// Obtener argumentos pasados al llamar a Navigator.pushNamed
-    switch (settings.name) {
-      case '/Home':
+  static const String homeRoute = '/home';
+
+  static Route<dynamic> generateRoute(
+    RouteSettings settings, {
+    required ValueChanged<ThemeMode> onThemeChanged,
+    required ValueChanged<Locale> onLocaleChanged,
+    required ThemeMode currentThemeMode,
+    required Locale currentLocale,
+  }) {
+    switch (settings.name?.toLowerCase()) {
+      case homeRoute:
+      case '/':
         return MaterialPageRoute(
-          builder: (_) => const MyHomePage(),
+          builder: (_) => MyHomePage(
+            onThemeChanged: onThemeChanged,
+            onLocaleChanged: onLocaleChanged,
+            currentThemeMode: currentThemeMode,
+            currentLocale: currentLocale,
+          ),
         );
       default:
-        // If there is no such named route in the switch statement, e.g. /third
         return MaterialPageRoute(
-          builder: (_) => Scaffold(
-            body: SafeArea(
-              child: Text(
-                'Route Error',
+          builder: (context) {
+            final strings = AppStrings.of(context);
+            return Scaffold(
+              appBar: AppBar(),
+              body: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(strings.routeError),
+                    const SizedBox(height: 12),
+                    FilledButton(
+                      onPressed: () => Navigator.of(context)
+                          .pushNamedAndRemoveUntil(homeRoute, (_) => false),
+                      child: Text(strings.backToHome),
+                    )
+                  ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
     }
   }
